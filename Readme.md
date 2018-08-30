@@ -1,7 +1,7 @@
 # Личный проект «Кэндишоп» [![Build status][travis-image]][travis-url]
 
 * Студент: [Alexandra Samonenko](https://up.htmlacademy.ru/javascript/15/user/220409).
-* Наставник: `Неизвестно`.
+* Наставник: Игорь Тараканов.
 
 ---
 
