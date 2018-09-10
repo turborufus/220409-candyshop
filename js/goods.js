@@ -118,33 +118,40 @@ var createCard = function (cardTemplate, goodObject) {
   picture.alt = goodObject.name;
 
   var price = goodElement.querySelector('.card__price');
-  price.textContent = goodObject.price;
+  price.firstChild.textContent = goodObject.price;
 
-//  var weight = goodElement.querySelector('.card__weight');
-//  weight.textContent = '/ ' + goodObject.weight + ' Г';
+  var weight = goodElement.querySelector('.card__weight');
+  weight.textContent = '/ ' + goodObject.weight + ' Г';
 
-  var rating = goodElement.querySelector('.card__rating');
+  var rating = goodElement.querySelector('.stars__rating');
   var ratingClass = '';
+  var ratingText = goodObject.rating.value;
   switch (goodObject.rating.value) {
     case 1:
       ratingClass = 'stars__rating--one';
+      ratingText += ' звезда';
       break;
     case 2:
       ratingClass = 'stars__rating--two';
+      ratingText += ' звезды';
       break;
     case 3:
       ratingClass = 'stars__rating--three';
+      ratingText += ' звезды';
       break;
     case 4:
       ratingClass = 'stars__rating--four';
+      ratingText += ' звезды';
       break;
     case 5:
       ratingClass = 'stars__rating--five';
+      ratingText += ' звёзд';
       break;
     default:
       ratingClass = '';
       break;
   }
+  rating.textContent = ratingText;
   rating.classList.add(ratingClass);
 
   var starCount = goodElement.querySelector('.star__count');
