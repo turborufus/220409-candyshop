@@ -164,7 +164,7 @@ var createCard = function (cardTemplate, goodObject) {
 };
 
 var createCardInCart = function (cardInCartTemplate, goodObject) {
-  var goodElement = cardTemplate.cloneNode(true);
+  var goodElement = cardInCartTemplate.cloneNode(true);
 
   var title = goodElement.querySelector('.card-order__title');
   title.textContent = goodObject.name;
