@@ -26,7 +26,8 @@ var paymentCard = document.querySelector('.payment__card-wrap');
 var cardStatus = paymentCard.querySelector('.payment__card-status');
 
 var onValueChange = function () {
-  var isCardValid = cardNumberInput.validity.valid && cardDateInput.validity.valid && cardCvcInput.validity.valid && cardholderInput.validity.valid && isCardNumberValid(cardNumberInput.value);
+  var isNumberValid = isCardNumberValid(cardNumberInput.value);
+  var isCardValid = cardNumberInput.validity.valid && cardDateInput.validity.valid && cardCvcInput.validity.valid && cardholderInput.validity.valid && isNumberValid;
 
   var statusText = 'Неизвестен';
   if (isCardValid) {
@@ -47,6 +48,8 @@ cardNumberInput.addEventListener('invalid', function () {
     cardNumberInput.setCustomValidity('Поле обязательно к заполнению');
   } else if (cardNumberInput.validity.patternMismatch) {
     cardNumberInput.setCustomValidity('Номер карты состоит только из цифр');
+  } else if (!isCardNumberValid(cardNumberInput.value)) {
+    cardNumberInput.setCustomValidity('Проверьте правильность указанного номера');
   } else {
     cardNumberInput.setCustomValidity('');
   }
@@ -83,11 +86,14 @@ cardholderInput.addEventListener('invalid', function () {
 });
 
 cardNumberInput.addEventListener('change', function () {
-  if (!isCardNumberValid(cardNumberInput.value)) {
-    cardNumberInput.setCustomValidity('Проверьте правильность указанного номера');
-  } else {
-    cardNumberInput.setCustomValidity('');
+  if (cardNumberInput.validity.valid) {
+    var isNumberValid = isCardNumberValid(cardNumberInput.value);
+    if (!isNumberValid) {
+      cardNumberInput.setCustomValidity('Проверьте правильность указанного номера');
+      cardNumberInput.validity.valid = false;
+    }
   }
+
   onValueChange();
 });
 
