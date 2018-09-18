@@ -41,7 +41,7 @@ var cardDateInput = paymentCard.querySelector('#payment__card-date');
 var cardCvcInput = paymentCard.querySelector('#payment__card-cvc');
 var cardholderInput = paymentCard.querySelector('#payment__cardholder');
 
-cardNumberInput.addEventListener('invalid', function () {
+cardNumberInput.addEventListener('change', function () {
   if (cardNumberInput.validity.tooShort || cardNumberInput.validity.tooLong) {
     cardNumberInput.setCustomValidity('Номер карты должен состоять из 16 цифр');
   } else if (cardNumberInput.validity.valueMissing) {
@@ -53,9 +53,10 @@ cardNumberInput.addEventListener('invalid', function () {
   } else {
     cardNumberInput.setCustomValidity('');
   }
+  onValueChange();
 });
 
-cardDateInput.addEventListener('invalid', function () {
+cardDateInput.addEventListener('change', function () {
   if (cardDateInput.validity.tooShort || cardDateInput.validity.tooLong || cardDateInput.validity.patternMismatch) {
     cardDateInput.setCustomValidity('Срок действия карты должен быть указан в формате ММ/ГГ');
   } else if (cardDateInput.validity.valueMissing) {
@@ -63,9 +64,10 @@ cardDateInput.addEventListener('invalid', function () {
   } else {
     cardDateInput.setCustomValidity('');
   }
+  onValueChange();
 });
 
-cardCvcInput.addEventListener('invalid', function () {
+cardCvcInput.addEventListener('change', function () {
   if (cardCvcInput.validity.tooShort || cardCvcInput.validity.tooLong || cardCvcInput.validity.patternMismatch) {
     cardCvcInput.setCustomValidity('Поле должно содержать 3 цифры');
   } else if (cardCvcInput.validity.valueMissing) {
@@ -73,9 +75,10 @@ cardCvcInput.addEventListener('invalid', function () {
   } else {
     cardCvcInput.setCustomValidity('');
   }
+  onValueChange();
 });
 
-cardholderInput.addEventListener('invalid', function () {
+cardholderInput.addEventListener('change', function () {
   if (cardholderInput.validity.patternMismatch) {
     cardholderInput.setCustomValidity('Поле должно содержать только латинские буквы');
   } else if (cardholderInput.validity.valueMissing) {
@@ -83,28 +86,5 @@ cardholderInput.addEventListener('invalid', function () {
   } else {
     cardholderInput.setCustomValidity('');
   }
-});
-
-cardNumberInput.addEventListener('change', function () {
-  if (cardNumberInput.validity.valid) {
-    var isNumberValid = isCardNumberValid(cardNumberInput.value);
-    if (!isNumberValid) {
-      cardNumberInput.setCustomValidity('Проверьте правильность указанного номера');
-      cardNumberInput.validity.valid = false;
-    }
-  }
-
-  onValueChange();
-});
-
-cardDateInput.addEventListener('change', function () {
-  onValueChange();
-});
-
-cardCvcInput.addEventListener('change', function () {
-  onValueChange();
-});
-
-cardholderInput.addEventListener('change', function () {
   onValueChange();
 });
