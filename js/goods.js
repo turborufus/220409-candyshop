@@ -477,3 +477,25 @@ var submitButton = document.querySelector('.buy__submit-btn');
 if (cardsInCart.classList.contains('goods__cards--empty')) {
   setBuyingFormDisabled(true);
 }
+
+var onRangeButtonMouseUp = function (evt) {
+  var target = evt.target;
+  var maxWidth = target.offsetParent.offsetWidth;
+  var leftOffset = target.offsetLeft;
+  var offsetInPercent = Math.round((leftOffset / maxWidth) * 100);
+
+  if (target === leftRangeButton) {
+    priceMin.textContent = offsetInPercent;
+  } else if (target === rightRangeButton) {
+    priceMax.textContent = offsetInPercent;
+  }
+};
+
+var range = document.querySelector('.range');
+var rightRangeButton = range.querySelector('.range__btn--right');
+var leftRangeButton = range.querySelector('.range__btn--left');
+var priceMin = range.querySelector('.range__price--min');
+var priceMax = range.querySelector('.range__price--max');
+
+rightRangeButton.addEventListener('mouseup', onRangeButtonMouseUp);
+leftRangeButton.addEventListener('mouseup', onRangeButtonMouseUp);
