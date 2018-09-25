@@ -279,10 +279,12 @@ var increaseAmountOfGood = function (goodElement, goodObject) {
 
 var decreaseAmountOfGood = function (goodElement, goodObject) {
   goodObject.orderedAmount -= 1;
-  if (goodObject.orderedAmount < 0) {
-    goodObject.orderedAmount = 0;
+  if (goodObject.orderedAmount <= 0) {
+    goodsInCartList.pop(goodObject);
+    removeCardElementFromCart(cardsInCart, goodElement);
+  } else {
+    updateCardInCartElement(goodElement, goodObject);
   }
-  updateCardInCartElement(goodElement, goodObject);
 };
 
 // обработчик добавления в корзину
@@ -311,8 +313,10 @@ var processCatalogEvent = function (eventString, target) {
 
       if (eventString === 'favorite') {
         doFavoriteGood(target);
+        break;
       } else if (eventString === 'add_in_cart') {
         addGoodInCart(title);
+        break;
       }
     }
     target = target.parentNode;
@@ -338,11 +342,14 @@ var processCartEvent = function (eventName, target) {
 
       if (eventName === 'increase') {
         increaseAmountOfGood(target, goodInCartObject);
+        break;
       } else if (eventName === 'decrease') {
         decreaseAmountOfGood(target, goodInCartObject);
+        break;
       } else if (eventName === 'remove') {
         goodsInCartList.pop(goodInCartObject);
         removeCardElementFromCart(cardsInCart, target);
+        break;
       }
     }
     target = target.parentNode;
@@ -478,17 +485,54 @@ if (cardsInCart.classList.contains('goods__cards--empty')) {
   setBuyingFormDisabled(true);
 }
 
-var onRangeButtonMouseUp = function (evt) {
-  var target = evt.target;
-  var maxWidth = target.offsetParent.offsetWidth;
-  var leftOffset = target.offsetLeft;
+var countOffsetInPercent = function (element) {
+  var maxWidth = element.offsetParent.offsetWidth;
+  var leftOffset = element.offsetLeft;
   var offsetInPercent = Math.round((leftOffset / maxWidth) * 100);
 
-  if (target === leftRangeButton) {
-    priceMin.textContent = offsetInPercent;
-  } else if (target === rightRangeButton) {
-    priceMax.textContent = offsetInPercent;
-  }
+  return offsetInPercent;
+};
+
+var onRangeButtonMouseDown = function (evt) {
+  evt.preventDefault();
+  var target = evt.target;
+
+  var startX = evt.clientX;
+
+  var onRangeButtonMouseMove = function (moveEvt) {
+    moveEvt.preventDefault();
+    var moveTarget = moveEvt.target;
+
+    var shiftX = startX - moveEvt.clientX;
+    startX = moveEvt.clientX;
+
+    var newX = moveTarget.offsetLeft - shiftX;
+    if (newX < 0) {
+      newX = 0;
+    } else if (newX > moveTarget.offsetParent.offsetWidth) {
+      newX = moveTarget.offsetParent.offsetWidth;
+    }
+    moveTarget.style.left = newX + 'px';
+  };
+
+  var onRangeButtonMouseUp = function (upEvt) {
+    upEvt.preventDefault();
+
+    var upTarget = upEvt.target;
+    var offsetInPercent = countOffsetInPercent(upTarget);
+
+    if (upTarget === leftRangeButton) {
+      priceMin.textContent = offsetInPercent;
+    } else if (upTarget === rightRangeButton) {
+      priceMax.textContent = offsetInPercent;
+    }
+
+    upTarget.removeEventListener('mousemove', onRangeButtonMouseMove);
+    upTarget.removeEventListener('mouseup', onRangeButtonMouseUp);
+  };
+
+  target.addEventListener('mousemove', onRangeButtonMouseMove);
+  target.addEventListener('mouseup', onRangeButtonMouseUp);
 };
 
 var range = document.querySelector('.range');
@@ -497,5 +541,5 @@ var leftRangeButton = range.querySelector('.range__btn--left');
 var priceMin = range.querySelector('.range__price--min');
 var priceMax = range.querySelector('.range__price--max');
 
-rightRangeButton.addEventListener('mouseup', onRangeButtonMouseUp);
-leftRangeButton.addEventListener('mouseup', onRangeButtonMouseUp);
+rightRangeButton.addEventListener('mousedown', onRangeButtonMouseDown);
+leftRangeButton.addEventListener('mousedown', onRangeButtonMouseDown);
