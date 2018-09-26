@@ -487,10 +487,34 @@ if (cardsInCart.classList.contains('goods__cards--empty')) {
 
 var countOffsetInPercent = function (element) {
   var maxWidth = element.offsetParent.offsetWidth;
-  var leftOffset = element.offsetLeft;
-  var offsetInPercent = Math.round((leftOffset / maxWidth) * 100);
+  var offset = element.offsetLeft + (element.clientWidth / 2);
+  var offsetInPercent = Math.round((offset / maxWidth) * 100);
 
-  return offsetInPercent;
+  if (element === leftRangeButton) {
+    priceMin.textContent = offsetInPercent;
+  } else if (element === rightRangeButton) {
+    priceMax.textContent = offsetInPercent;
+  }
+};
+
+var moveRightRangeButton = function (rightButton, leftButton, shift) {
+  var newX = rightButton.offsetLeft - shift;
+  if (newX < leftRangeButton.offsetLeft + rightButton.clientWidth / 2) {
+    newX = leftRangeButton.offsetLeft + Math.ceil(rightButton.clientWidth / 2);
+  } else if (newX > rightButton.offsetParent.offsetWidth - rightButton.clientWidth / 2) {
+    newX = rightButton.offsetParent.offsetWidth - Math.round(rightButton.clientWidth / 2);
+  }
+  rightButton.style.left = newX + 'px';
+};
+
+var moveLeftRangeButton = function (leftButton, rightButton, shift) {
+  var newX = leftButton.offsetLeft - shift;
+  if (newX < 0) {
+    newX = 0 - Math.round(leftButton.clientWidth / 2);
+  } else if (newX > rightRangeButton.offsetLeft - leftButton.clientWidth / 2) {
+    newX = rightRangeButton.offsetLeft - Math.round(leftButton.clientWidth / 2);
+  }
+  leftButton.style.left = newX + 'px';
 };
 
 var onRangeButtonMouseDown = function (evt) {
@@ -506,26 +530,22 @@ var onRangeButtonMouseDown = function (evt) {
     var shiftX = startX - moveEvt.clientX;
     startX = moveEvt.clientX;
 
-    var newX = moveTarget.offsetLeft - shiftX;
-    if (newX < 0) {
-      newX = 0;
-    } else if (newX > moveTarget.offsetParent.offsetWidth) {
-      newX = moveTarget.offsetParent.offsetWidth;
+    if (moveTarget === leftRangeButton) {
+      moveLeftRangeButton(moveTarget, rightRangeButton, shiftX);
+    } else if (moveTarget === rightRangeButton) {
+      moveRightRangeButton(moveTarget, leftRangeButton, shiftX);
     }
-    moveTarget.style.left = newX + 'px';
+
+    countOffsetInPercent(moveTarget);
   };
 
   var onRangeButtonMouseUp = function (upEvt) {
     upEvt.preventDefault();
 
     var upTarget = upEvt.target;
-    var offsetInPercent = countOffsetInPercent(upTarget);
-
-    if (upTarget === leftRangeButton) {
-      priceMin.textContent = offsetInPercent;
-    } else if (upTarget === rightRangeButton) {
-      priceMax.textContent = offsetInPercent;
-    }
+    countOffsetInPercent(upTarget);
+    rangeFillLine.style.left = leftRangeButton.offsetLeft + 'px';
+    rangeFillLine.style.right = (rightRangeButton.offsetParent.offsetWidth - rightRangeButton.offsetLeft) + 'px';
 
     upTarget.removeEventListener('mousemove', onRangeButtonMouseMove);
     upTarget.removeEventListener('mouseup', onRangeButtonMouseUp);
@@ -540,6 +560,9 @@ var rightRangeButton = range.querySelector('.range__btn--right');
 var leftRangeButton = range.querySelector('.range__btn--left');
 var priceMin = range.querySelector('.range__price--min');
 var priceMax = range.querySelector('.range__price--max');
+var rangeFillLine = range.querySelector('.range__fill-line');
+countOffsetInPercent(rightRangeButton);
+countOffsetInPercent(leftRangeButton);
 
 rightRangeButton.addEventListener('mousedown', onRangeButtonMouseDown);
 leftRangeButton.addEventListener('mousedown', onRangeButtonMouseDown);
