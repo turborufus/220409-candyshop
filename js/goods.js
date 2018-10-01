@@ -40,6 +40,23 @@ var createRandomIndexes = function (arrayLength) {
   return randomIndexes;
 };
 
+var numDecline = function (num, nominative, genitiveSingular, genitivePlural) {
+  if (num > 100 && (Math.round((num % 100) / 10)) == 1){
+    return genitivePlural;
+  } else {
+    num = num % 10;
+    if (num == 1) {
+      return nominative;
+    }
+    if (num >= 2 && num <= 4) {
+      return genitiveSingular;
+    }
+    if (num > 5 || num == 0) {
+      return genitivePlural;
+    }
+  }
+};
+
 var findGoodByTitle = function (goods, title) {
   var isFound = false;
   var step = 0;
@@ -56,8 +73,8 @@ var findGoodByTitle = function (goods, title) {
   return good;
 };
 
-var createGoodsList = function (goodsNumber) {
-  var goodsList = [];
+var createGoodsObjects = function (goodsNumber) {
+  var goodsObjects = [];
 
   var randomNameIndexes = createRandomIndexes(GOODS_NAMES.length);
   var randomPictureIndexes = createRandomIndexes(GOODS_PICTURES.length);
@@ -107,10 +124,10 @@ var createGoodsList = function (goodsNumber) {
       }
     }
 
-    goodsList.push(goodItem);
+    goodsObjects.push(goodItem);
   }
 
-  return goodsList;
+  return goodsObjects;
 };
 
 // создание карточки товара
@@ -126,62 +143,51 @@ var createCard = function (cardTemplate, goodObject) {
   }
   goodElement.classList.add(availabilityClass);
 
-  var title = goodElement.querySelector('.card__title');
-  title.textContent = goodObject.name;
-
-  var picture = goodElement.querySelector('.card__img');
-  picture.src = goodObject.picture;
-  picture.alt = goodObject.name;
+  goodElement.querySelector('.card__title').textContent = goodObject.name;
+  goodElement.querySelector('.card__img').src = goodObject.picture;
+  goodElement.querySelector('.card__img').alt = goodObject.name;
 
   var price = goodElement.querySelector('.card__price');
   price.firstChild.textContent = goodObject.price;
 
-  var weight = goodElement.querySelector('.card__weight');
-  weight.textContent = '/ ' + goodObject.weight + ' Г';
+  goodElement.querySelector('.card__weight').textContent = '/ ' + goodObject.weight + ' Г';
 
   var rating = goodElement.querySelector('.stars__rating');
+  rating.classList.remove('stars__rating--five');
+  var ratingValue = goodObject.rating.value;
   var ratingClass = '';
   var ratingText = goodObject.rating.value;
-  switch (goodObject.rating.value) {
+  switch (ratingValue) {
     case 1:
-      ratingClass = 'stars__rating--one';
-      ratingText += ' звезда';
+      ratingClass = 'one';
       break;
     case 2:
-      ratingClass = 'stars__rating--two';
-      ratingText += ' звезды';
+      ratingClass = 'two';
       break;
     case 3:
-      ratingClass = 'stars__rating--three';
-      ratingText += ' звезды';
+      ratingClass = 'three';
       break;
     case 4:
-      ratingClass = 'stars__rating--four';
-      ratingText += ' звезды';
+      ratingClass = 'four';
       break;
     case 5:
-      ratingClass = 'stars__rating--five';
-      ratingText += ' звёзд';
+      ratingClass = 'five';
       break;
     default:
       ratingClass = '';
       break;
   }
-  rating.textContent = ratingText;
-  rating.classList.add(ratingClass);
+  rating.textContent = ratingValue + ' ' + numDecline(ratingValue, 'звезда', 'звёзд', 'звезды');
+  rating.classList.add('stars__rating--' + ratingClass);
 
-  var starCount = goodElement.querySelector('.star__count');
-  starCount.textContent = goodObject.rating.number;
+  goodElement.querySelector('.star__count').textContent = goodObject.rating.number;
 
   var sugarText = 'Без сахара. ';
   if (goodObject.nutritionFacts.sugar) {
     sugarText = 'Содержит сахар. ';
   }
-  var characteristic = goodElement.querySelector('.card__characteristic');
-  characteristic.textContent = sugarText + goodObject.nutritionFacts.energy + ' ккал';
-
-  var compositionList = goodElement.querySelector('.card__composition-list');
-  compositionList.textContent = goodObject.nutritionFacts.contents;
+  goodElement.querySelector('.card__characteristic').textContent = sugarText + goodObject.nutritionFacts.energy + ' ккал';
+  goodElement.querySelector('.card__composition-list').textContent = goodObject.nutritionFacts.contents;
 
   return goodElement;
 };
@@ -201,7 +207,7 @@ var fillCatalogByCards = function (goodsList) {
     var goodElement = createCard(cardTemplate, goodsList[i]);
     fragmentOfCards.appendChild(goodElement);
   }
-  catalogCards.appendChild(fragmentOfCards);
+  catalogElements.appendChild(fragmentOfCards);
 };
 
 var addCardElementInCart = function (cardsInCart, addedGood) {
@@ -281,7 +287,7 @@ var decreaseAmountOfGood = function (goodElement, goodObject) {
   goodObject.orderedAmount -= 1;
   if (goodObject.orderedAmount <= 0) {
     goodsInCartList.pop(goodObject);
-    removeCardElementFromCart(cardsInCart, goodElement);
+    removeCardElementFromCart(cartElements, goodElement);
   } else {
     updateCardInCartElement(goodElement, goodObject);
   }
@@ -299,15 +305,15 @@ var addGoodInCart = function (title) {
     delete addedGood.nutritionFacts;
     delete addedGood.rating;
     goodsInCartList.push(addedGood);
-    addCardElementInCart(cardsInCart, addedGood);
+    addCardElementInCart(cartElements, addedGood);
   } else { // товар в корзине есть
-    var cardInCartElement = findCardInCartByTitle(cardsInCart, title);
+    var cardInCartElement = findCardInCartByTitle(cartElements, title);
     increaseAmountOfGood(cardInCartElement, goodInCartObject);
   }
 };
 
 var processCatalogEvent = function (eventString, target) {
-  while (target !== catalogCards) {
+  while (target !== catalogElements) {
     if (target.classList.contains('catalog__card')) {
       var title = target.querySelector('.card__title').textContent;
 
@@ -324,6 +330,7 @@ var processCatalogEvent = function (eventString, target) {
 };
 
 var onCatalogCardsClick = function (evt) {
+  evt.preventDefault();
   var target = evt.target;
   if (target.classList.contains('card__btn-favorite')) {
     // обработка события добавления/удаления из Избранного
@@ -335,7 +342,7 @@ var onCatalogCardsClick = function (evt) {
 };
 
 var processCartEvent = function (eventName, target) {
-  while (target !== cardsInCart) {
+  while (target !== cartElements) {
     if (target.classList.contains('goods_card')) {
       var title = target.querySelector('.card-order__title').textContent;
       var goodInCartObject = findGoodByTitle(goodsInCartList, title);
@@ -348,7 +355,7 @@ var processCartEvent = function (eventName, target) {
         break;
       } else if (eventName === 'remove') {
         goodsInCartList.pop(goodInCartObject);
-        removeCardElementFromCart(cardsInCart, target);
+        removeCardElementFromCart(cartElements, target);
         break;
       }
     }
@@ -357,6 +364,7 @@ var processCartEvent = function (eventName, target) {
 };
 
 var onCartCardsClick = function (evt) {
+  evt.preventDefault();
   var target = evt.target;
   if (target.classList.contains('card-order__btn--increase')) {
     processCartEvent('increase', target);
@@ -451,21 +459,21 @@ var setBuyingFormDisabled = function (disabled) {
   submitButton.disabled = disabled;
 };
 
-var catalogCards = document.querySelector('.catalog__cards');
-catalogCards.classList.remove('catalog__cards--load');
+var catalogElements = document.querySelector('.catalog__cards');
+catalogElements.classList.remove('catalog__cards--load');
 var cardTemplate = document.querySelector('#card').content.querySelector('.catalog__card');
-var cardsInCart = document.querySelector('.goods__cards');
+var cartElements = document.querySelector('.goods__cards');
 var cardInCartTemplate = document.querySelector('#card-order').content.querySelector('.goods_card');
 
-var catalogLoad = catalogCards.querySelector('.catalog__load');
+var catalogLoad = catalogElements.querySelector('.catalog__load');
 catalogLoad.classList.add('visually-hidden');
 
-var goodsList = createGoodsList(GOODS_NUMBER);
+var goodsList = createGoodsObjects(GOODS_NUMBER);
 var goodsInCartList = [];
 
 fillCatalogByCards(goodsList);
-catalogCards.addEventListener('click', onCatalogCardsClick);
-cardsInCart.addEventListener('click', onCartCardsClick);
+catalogElements.addEventListener('click', onCatalogCardsClick);
+cartElements.addEventListener('click', onCartCardsClick);
 
 var order = document.querySelector('.order');
 
@@ -481,7 +489,7 @@ deliver.addEventListener('click', onDeliverSectionClick);
 
 var submitButton = document.querySelector('.buy__submit-btn');
 
-if (cardsInCart.classList.contains('goods__cards--empty')) {
+if (cartElements.classList.contains('goods__cards--empty')) {
   setBuyingFormDisabled(true);
 }
 
