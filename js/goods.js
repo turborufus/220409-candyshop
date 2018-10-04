@@ -499,6 +499,11 @@ if (cartElements.classList.contains('goods__cards--empty')) {
 
 /** ********************************************************************************/
 
+var renderFillLine = function () {
+  rangeFillLine.style.left = leftRangeButton.offsetLeft + 'px';
+  rangeFillLine.style.right = (rightRangeButton.offsetParent.offsetWidth - rightRangeButton.offsetLeft) + 'px';
+};
+
 var countOffsetInPercent = function (element) {
   var maxWidth = element.offsetParent.offsetWidth;
   var offset = element.offsetLeft + (element.clientWidth / 2);
@@ -509,6 +514,8 @@ var countOffsetInPercent = function (element) {
   } else if (element === rightRangeButton) {
     priceMax.textContent = offsetInPercent;
   }
+
+  renderFillLine();
 };
 
 var moveRightRangeButton = function (rightButton, leftButton, shift) {
@@ -557,9 +564,7 @@ var onRangeButtonMouseDown = function (evt) {
     upEvt.preventDefault();
 
     var upTarget = upEvt.target;
-    countOffsetInPercent(upTarget);
-    rangeFillLine.style.left = leftRangeButton.offsetLeft + 'px';
-    rangeFillLine.style.right = (rightRangeButton.offsetParent.offsetWidth - rightRangeButton.offsetLeft) + 'px';
+    countOffsetInPercent(upTarget);    
 
     upTarget.removeEventListener('mousemove', onRangeButtonMouseMove);
     upTarget.removeEventListener('mouseup', onRangeButtonMouseUp);
