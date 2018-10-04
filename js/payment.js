@@ -1,25 +1,29 @@
 'use strict';
 
+var onlyNumber = function (formElement) {
+  formElement.value = formElement.value.replace(/\D+/g, '');
+};
+
 var isCardNumberValid = function (cardNumber) {
-  var isNumberValid = false;
-  var cardNumberDigits = cardNumber.split('');
+  onlyNumber(cardNumber);
+  var cardNumberDigits = cardNumber.value;
   var sum = 0;
   var arrLength = cardNumberDigits.length;
-  for (var i = 0; i < arrLength; i++) {
-    var digit = parseInt(cardNumberDigits[arrLength - i - 1], 10);
-    if (i % 2 === 1) {
-      digit *= 2;
-      if (digit > 9) {
-        digit -= 9;
+  if (arrLength === 16) {
+    for (var i = 0; i < arrLength; i++) {
+      var digit = parseInt(cardNumberDigits[arrLength - i - 1], 10);
+      if (i % 2 === 1) {
+        digit *= 2;
+        if (digit > 9) {
+          digit -= 9;
+        }
       }
+      sum += digit;
     }
-    sum += digit;
-  }
-  if (sum % 10 === 0) {
-    isNumberValid = true;
+    return (sum % 10 === 0);
   }
 
-  return isNumberValid;
+  return false;
 };
 
 var paymentCard = document.querySelector('.payment__card-wrap');
@@ -47,7 +51,7 @@ cardNumberInput.addEventListener('change', function () {
   } else if (cardNumberInput.validity.valueMissing) {
     cardNumberInput.setCustomValidity('Поле обязательно к заполнению');
   } else if (cardNumberInput.validity.patternMismatch) {
-    cardNumberInput.setCustomValidity('Номер карты состоит только из цифр');
+    cardNumberInput.setCustomValidity('Номер карты состоит из 16 цифр');
   } else if (!isCardNumberValid(cardNumberInput.value)) {
     cardNumberInput.setCustomValidity('Проверьте правильность указанного номера');
   } else {
