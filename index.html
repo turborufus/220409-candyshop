@@ -215,7 +215,7 @@
                 <div class="payment__inputs">
                   <div class="payment__card-group">
                     <p class="text-input text-input--light payment__input-wrap payment__input-wrap--card-number">
-                      <input type="text" class="text-input__input" name="card-number" id="payment__card-number" placeholder="Номер карты" required pattern="[0-9]{16}" minlength="16" maxlength="16" onkeyup="window.util.onlyNumber(this)">
+                      <input type="text" class="text-input__input" name="card-number" id="payment__card-number" placeholder="Номер карты" required pattern="[0-9]{16}" minlength="16" maxlength="16" onkeyup="onlyNumber(this)">
                       <label class="text-input__label" for="payment__card-number">Номер карты</label>
                     </p>
 
@@ -483,12 +483,7 @@
     </div>
   </template>
   
-  <script src="js/util.js"></script>
-  <script src="js/payment.js"></script> 
-  <script src="js/order.js"></script>
-  <script src="js/data.js"></script>
-  <script src="js/cart.js"></script>
-  <script src="js/catalog.js"></script>
-  <script src="js/filter.js"></script>
+  <script src="js/goods.js"></script>
+  <script src="js/payment.js"></script>
 </body>
 </html>
