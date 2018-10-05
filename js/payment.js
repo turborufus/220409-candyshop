@@ -96,8 +96,6 @@
     paymentCard.querySelector('#payment__card-date').disabled = disabled;
     paymentCard.querySelector('#payment__card-cvc').disabled = disabled;
     paymentCard.querySelector('#payment__cardholder').disabled = disabled;
-    
-    console.log('setPaymentCardFormDisabled ' + disabled);
   };
 
   var onPaymentSectionClick = function (evt) {

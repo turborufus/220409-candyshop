@@ -8,8 +8,6 @@
     deliverCourierForm.querySelector('#deliver__floor').disabled = disabled;
     deliverCourierForm.querySelector('#deliver__room').disabled = disabled;
     deliverCourierForm.querySelector('.deliver__textarea').disabled = disabled;
-    
-    console.log('setCourierFormDisabled ' + disabled);
   };
 
   var setStoreFormDisabled = function (disabled) {
@@ -17,7 +15,6 @@
     for (var i = 0; i < storeInputs.length; i++) {
       storeInputs[i].disabled = disabled;
     }
-    console.log('setStoreFormDisabled ' + disabled);
   };
 
   var onDeliverSectionClick = function (evt) {
@@ -37,15 +34,12 @@
       deliverCourierForm.classList.remove(hiddenClass);
       setCourierFormDisabled(window.cart.isEmpty()); // если корзина пустая, то форма остается неактивной
     }
-    console.log('onDeliverSectionClick');
   };
 
   var setContactDataFormDisabled = function (disabled) {
     order.querySelector('#contact-data__name').disabled = disabled;
     order.querySelector('#contact-data__tel').disabled = disabled;
     order.querySelector('#contact-data__email').disabled = disabled;
-    
-    console.log('setContactDataFormDisabled ' + disabled);
   };
 
   var setBuyingFormDisabled = function (disabled) {
