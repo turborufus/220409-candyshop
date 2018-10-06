@@ -1,6 +1,13 @@
 'use strict';
 
 (function () {
+  var orderForm = document.querySelector('.buy').querySelector('form');
+  var order = orderForm.querySelector('.order');
+  var deliver = order.querySelector('.deliver');
+  var deliverStoreForm = deliver.querySelector('.deliver__store');
+  var deliverCourierForm = deliver.querySelector('.deliver__courier');
+  var submitButton = orderForm.querySelector('.buy__submit-btn');
+
   // disabled = true / false
   var setCourierFormDisabled = function (disabled) {
     deliverCourierForm.querySelector('#deliver__street').disabled = disabled;
@@ -52,12 +59,20 @@
     submitButton.disabled = disabled;
   };
 
-  var order = document.querySelector('.order');
-  var deliver = order.querySelector('.deliver');
-  var deliverStoreForm = deliver.querySelector('.deliver__store');
-  var deliverCourierForm = deliver.querySelector('.deliver__courier');
+  var onUploadSuccessHandler = function () {
+    window.modal.showSuccess();
+  };
+
+  var onUploadErrorHandler = function (errorMessage) {
+    window.modal.showError(errorMessage);
+  };
+
   deliver.addEventListener('click', onDeliverSectionClick);
-  var submitButton = document.querySelector('.buy__submit-btn');
+
+  orderForm.addEventListener('submit', function (evt) {
+    window.backend.upload(new FormData(orderForm), onUploadSuccessHandler, onUploadErrorHandler);
+    evt.preventDefault();
+  });
 
   window.order = {
     setBuyingFormDisabled: setBuyingFormDisabled

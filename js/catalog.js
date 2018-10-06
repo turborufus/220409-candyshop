@@ -2,11 +2,13 @@
 
 (function () {
   var catalogElements = document.querySelector('.catalog__cards');
-  catalogElements.classList.remove('catalog__cards--load');
   var catalogLoad = catalogElements.querySelector('.catalog__load');
-  catalogLoad.classList.add('visually-hidden');
-
   var cardTemplate = document.querySelector('#card').content.querySelector('.catalog__card');
+
+  var hideCatalogLoad = function () {
+    catalogElements.classList.remove('catalog__cards--load');
+    catalogLoad.classList.add('visually-hidden');
+  };
 
   // создание карточки товара для Каталога
   var createCard = function (goodObject) {
@@ -24,7 +26,7 @@
     goodElement.classList.add(availabilityClass);
 
     goodElement.querySelector('.card__title').textContent = goodObject.name;
-    goodElement.querySelector('.card__img').src = goodObject.picture;
+    goodElement.querySelector('.card__img').src = 'img/cards/' + goodObject.picture;
     goodElement.querySelector('.card__img').alt = goodObject.name;
 
     var price = goodElement.querySelector('.card__price');
@@ -127,8 +129,17 @@
     }
   };
 
-  renderCatalog();
+  var onLoadSuccessHandle = function (goods) {
+    window.data.goods = goods;
+    renderCatalog();
+    hideCatalogLoad();
+  };
+
+  var onLoadErrorHandle = function (errorMessage) {
+    window.modal.showError(errorMessage);
+  };
 
   catalogElements.addEventListener('click', onCatalogCardsClick);
+  window.backend.load(onLoadSuccessHandle, onLoadErrorHandle);
 
 })();
