@@ -38,7 +38,7 @@
     var cartElement = cardInCartTemplate.cloneNode(true);
     cartElement.querySelector('.card-order__title').textContent = goodObject.name;
 
-    cartElement.querySelector('.card-order__img').src = goodObject.picture;
+    cartElement.querySelector('.card-order__img').src = 'img/cards/' + goodObject.picture;
     cartElement.querySelector('.card-order__img').alt = goodObject.name;
 
     cartElement.querySelector('.card-order__price').textContent = goodObject.price + ' ₽';
