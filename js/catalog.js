@@ -4,6 +4,17 @@
   var catalogElements = document.querySelector('.catalog__cards');
   var catalogLoad = catalogElements.querySelector('.catalog__load');
   var cardTemplate = document.querySelector('#card').content.querySelector('.catalog__card');
+  var emptyFilters = document.querySelector('#empty-filters').content.querySelector('.catalog__empty-filter');
+
+  var catalogFilterForm = document.querySelector('.catalog__sidebar').querySelector('form');
+
+  var ratingValueToClassName = {
+    1: 'stars__rating--one',
+    2: 'stars__rating--two',
+    3: 'stars__rating--three',
+    4: 'stars__rating--four',
+    5: 'stars__rating--five'
+  };
 
   var hideCatalogLoad = function () {
     catalogElements.classList.remove('catalog__cards--load');
@@ -37,29 +48,8 @@
     var rating = goodElement.querySelector('.stars__rating');
     rating.classList.remove('stars__rating--five');
     var ratingValue = goodObject.rating.value;
-    var ratingClass = '';
-    switch (ratingValue) {
-      case 1:
-        ratingClass = 'one';
-        break;
-      case 2:
-        ratingClass = 'two';
-        break;
-      case 3:
-        ratingClass = 'three';
-        break;
-      case 4:
-        ratingClass = 'four';
-        break;
-      case 5:
-        ratingClass = 'five';
-        break;
-      default:
-        ratingClass = '';
-        break;
-    }
     rating.textContent = ratingValue + ' ' + window.util.numDecline(ratingValue, 'звезда', 'звёзд', 'звезды');
-    rating.classList.add('stars__rating--' + ratingClass);
+    rating.classList.add(ratingValueToClassName[ratingValue]);
 
     goodElement.querySelector('.star__count').textContent = goodObject.rating.number;
 
@@ -72,17 +62,34 @@
 
     return goodElement;
   };
-
-  var renderCatalog = function () {
-    var fragmentOfCards = document.createDocumentFragment();
-    for (var i = 0; i < window.data.goods.length; i++) {
-      var goodElement = createCard(window.data.goods[i]);
-      fragmentOfCards.appendChild(goodElement);
+  
+  var clearCatalog = function () {
+    console.log(catalogElements);
+    for (var i = 0; i < catalogElements.children.length; i++) {
+      var item = catalogElements.children[i];
+      if (item.classList.contains('catalog__card') || item.classList.contains('catalog__empty-filter')) {        
+        catalogElements.removeChild(catalogElements.children[i]);
+      }
     }
-    catalogElements.appendChild(fragmentOfCards);
+    console.log(catalogElements);
   };
 
-    // обработчик добавления в корзину
+  var renderCatalog = function (goods) {
+    clearCatalog();
+    var fragmentOfCards = document.createDocumentFragment();
+    goods.forEach(function (item) {
+      var goodElement = createCard(item);
+      fragmentOfCards.appendChild(goodElement);
+    });
+    catalogElements.appendChild(fragmentOfCards);
+  };
+  
+  var showEmptyFilters = function () {
+    clearCatalog();
+    catalogElements.appendChild(emptyFilters);
+  }
+
+  // обработчик добавления в корзину
   var addGoodInCart = function (title) {
     var indexOfGood = window.util.getIndexByTitle(window.data.goods, title);
     var indexOfGoodInCart = window.util.getIndexByTitle(window.data.goodsInCart, title);
@@ -94,12 +101,20 @@
     }
   };
 
+  // добавление/удаление в Избранное
+  var changeFavoriteStatus = function (element) {
+    element.classList.toggle('card__btn-favorite--selected');
+    element.querySelector('.card__btn-favorite').blur();
+    var title = element.querySelector('.card__title').textContent;
+    var goodObjectIndex = window.util.getIndexByTitle(window.data.goods, title);
+    window.data.goods[goodObjectIndex].favorite = !window.data.goods[goodObjectIndex].favorite;
+  };
+
   var processCatalogEvent = function (eventString, target) {
     while (target !== catalogElements) {
       if (target.classList.contains('catalog__card')) {
         if (eventString === 'favorite') {
-          target.classList.toggle('card__btn-favorite--selected');
-          target.querySelector('.card__btn-favorite').blur();
+          changeFavoriteStatus(target);
           break;
         } else if (eventString === 'add_in_cart') {
           var title = target.querySelector('.card__title').textContent;
@@ -129,9 +144,16 @@
     }
   };
 
+  catalogFilterForm.addEventListener('change', function () {
+    window.filters.update(window.data.goods);
+  });
+
   var onLoadSuccessHandle = function (goods) {
     window.data.goods = goods;
-    renderCatalog();
+    goods.forEach(function (goodObject) {
+      goodObject.favorite = false; // добавляем новое поле для фильтрации по Извранным
+    });
+    renderCatalog(window.data.goods);
     hideCatalogLoad();
   };
 
@@ -141,5 +163,10 @@
 
   catalogElements.addEventListener('click', onCatalogCardsClick);
   window.backend.load(onLoadSuccessHandle, onLoadErrorHandle);
+  
+  window.catalog = {
+    render : renderCatalog,
+    showEmptyFilters: showEmptyFilters
+  };
 
 })();

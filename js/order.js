@@ -19,9 +19,9 @@
 
   var setStoreFormDisabled = function (disabled) {
     var storeInputs = deliverStoreForm.querySelectorAll('[name="store"]');
-    for (var i = 0; i < storeInputs.length; i++) {
-      storeInputs[i].disabled = disabled;
-    }
+    storeInputs.forEach(function (inputItem) {
+      inputItem.disabled = disabled;
+    });
   };
 
   var onDeliverSectionClick = function (evt) {

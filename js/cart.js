@@ -6,18 +6,15 @@
 
   var cardInCartTemplate = document.querySelector('#card-order').content.querySelector('.goods_card');
 
-
   var getCartNumerics = function () {
     var numDataObject = {
       orderedAmount: 0,
       price: 0
     };
-
-    for (var i = 0; i < window.data.goodsInCart.length; i++) {
-      numDataObject.orderedAmount += window.data.goodsInCart[i].orderedAmount;
-      numDataObject.price += window.data.goodsInCart[i].orderedAmount * window.data.goodsInCart[i].price;
-    }
-
+    window.data.goodsInCart.forEach(function (item) {
+      numDataObject.orderedAmount += item.orderedAmount;
+      numDataObject.price += item.orderedAmount * item.price;
+    });
     return numDataObject;
   };
 
@@ -63,10 +60,11 @@
       cartElements.classList.remove('goods__cards--empty');
 
       var fragmentOfElements = document.createDocumentFragment();
-      for (var i = 0; i < window.data.goodsInCart.length; i++) {
-        var newCartElement = createCardInCart(window.data.goodsInCart[i]);
+
+      window.data.goodsInCart.forEach(function (item) {
+        var newCartElement = createCardInCart(item);
         fragmentOfElements.appendChild(newCartElement);
-      }
+      });
       cartElements.appendChild(fragmentOfElements);
 
       window.order.setBuyingFormDisabled(false);

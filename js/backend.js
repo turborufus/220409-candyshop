@@ -4,7 +4,7 @@
   var URL_LOAD = 'https://js.dump.academy/candyshop/data';
   var URL_UPLOAD = 'https://js.dump.academy/candyshop';
   var SERVER_TIMEOUT = 10000;
-  var CODE = {
+  var Code = {
     OK: 200,
     BAD_REQUEST: 400,
     NOT_FOUND: 404,
@@ -17,13 +17,13 @@
     xhr.responseType = 'json';
 
     xhr.addEventListener('load', function () {
-      if (xhr.status === CODE.OK) {
+      if (xhr.status === Code.OK) {
         onSuccess(xhr.response);
-      } else if (xhr.status === CODE.BAD_REQUEST) {
+      } else if (xhr.status === Code.BAD_REQUEST) {
         onError('Неправильный запрос: ' + xhr.status);
-      } else if (xhr.status === CODE.NOT_FOUND) {
+      } else if (xhr.status === Code.NOT_FOUND) {
         onError('Ничего не найдено: ' + xhr.status);
-      } else if (xhr.status === CODE.INTERNAL_SERVER_ERROR) {
+      } else if (xhr.status === Code.INTERNAL_SERVER_ERROR) {
         onError('Внутренняя ошибка сервера: ' + xhr.status);
       } else {
         onError('Статус ответа: ' + xhr.status + ' ' + xhr.statusText);
