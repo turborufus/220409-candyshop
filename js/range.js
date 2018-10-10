@@ -95,7 +95,7 @@
     target.addEventListener('mousemove', onRangeButtonMouseMove);
     target.addEventListener('mouseup', onRangeButtonMouseUp);
   };
-  
+
   window.range = {
     init: initRange
   };
