@@ -6,8 +6,6 @@
   var cardTemplate = document.querySelector('#card').content.querySelector('.catalog__card');
   var emptyFilters = document.querySelector('#empty-filters').content.querySelector('.catalog__empty-filter');
 
-  var catalogFilterForm = document.querySelector('.catalog__sidebar').querySelector('form');
-
   var ratingValueToClassName = {
     1: 'stars__rating--one',
     2: 'stars__rating--two',
@@ -60,18 +58,16 @@
     goodElement.querySelector('.card__characteristic').textContent = sugarText + goodObject.nutritionFacts.energy + ' ккал';
     goodElement.querySelector('.card__composition-list').textContent = goodObject.nutritionFacts.contents;
 
+    if (goodObject.favorite) {
+      goodElement.classList.toggle('card__btn-favorite--selected');
+    }
+
     return goodElement;
   };
-  
+
   var clearCatalog = function () {
-    console.log(catalogElements);
-    for (var i = 0; i < catalogElements.children.length; i++) {
-      var item = catalogElements.children[i];
-      if (item.classList.contains('catalog__card') || item.classList.contains('catalog__empty-filter')) {        
-        catalogElements.removeChild(catalogElements.children[i]);
-      }
-    }
-    console.log(catalogElements);
+    catalogElements.innerHTML = '';
+    catalogElements.appendChild(catalogLoad);
   };
 
   var renderCatalog = function (goods) {
@@ -83,11 +79,11 @@
     });
     catalogElements.appendChild(fragmentOfCards);
   };
-  
+
   var showEmptyFilters = function () {
     clearCatalog();
     catalogElements.appendChild(emptyFilters);
-  }
+  };
 
   // обработчик добавления в корзину
   var addGoodInCart = function (title) {
@@ -144,28 +140,11 @@
     }
   };
 
-  catalogFilterForm.addEventListener('change', function () {
-    window.filters.update(window.data.goods);
-  });
-
-  var onLoadSuccessHandle = function (goods) {
-    window.data.goods = goods;
-    goods.forEach(function (goodObject) {
-      goodObject.favorite = false; // добавляем новое поле для фильтрации по Извранным
-    });
-    renderCatalog(window.data.goods);
-    hideCatalogLoad();
-  };
-
-  var onLoadErrorHandle = function (errorMessage) {
-    window.modal.showError(errorMessage);
-  };
-
   catalogElements.addEventListener('click', onCatalogCardsClick);
-  window.backend.load(onLoadSuccessHandle, onLoadErrorHandle);
-  
+
   window.catalog = {
-    render : renderCatalog,
+    render: renderCatalog,
+    hideLoadMessage: hideCatalogLoad,
     showEmptyFilters: showEmptyFilters
   };
 

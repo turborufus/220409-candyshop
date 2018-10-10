@@ -36,10 +36,27 @@
     return (formElement.classList.contains('visually-hidden'));
   };
 
+  var debounce = function (fun) {
+    var DEBOUNCE_INTERVAL = 500;
+    var lastTimeout = null;
+
+    return function () {
+      var args = arguments;
+      if (lastTimeout) {
+        window.clearTimeout(lastTimeout);
+      }
+      lastTimeout = window.setTimeout(function () {
+        fun.apply(null, args);
+      }, DEBOUNCE_INTERVAL);
+    };
+  };
+
+
   window.util = {
     getIndexByTitle: getIndexByTitle,
     numDecline: numDecline,
     onlyNumber: onlyNumber,
-    isFormHidden: isFormHidden
+    isFormHidden: isFormHidden,
+    debounce: debounce
   };
 })();
