@@ -8,7 +8,7 @@
     });
     window.catalog.render(window.data.goods);
     window.range.init();
-    window.filters.updateItemCountLabels(window.data.goods);
+    window.filters.initItemCountLabels(window.data.goods);
 
     window.catalog.hideLoadMessage();
   };

@@ -43,8 +43,8 @@
     var newX = rightButton.offsetLeft - shift;
     if (newX < leftRangeButton.offsetLeft) {
       newX = leftRangeButton.offsetLeft;
-    } else if (newX > rightButton.offsetParent.offsetWidth - rightButton.clientWidth / 2) {
-      newX = rightButton.offsetParent.offsetWidth - Math.round(rightButton.clientWidth / 2);
+    } else if (newX > rightButton.offsetParent.offsetWidth) {
+      newX = rightButton.offsetParent.offsetWidth;
     }
     rightButton.style.left = newX + 'px';
   };
@@ -52,7 +52,7 @@
   var moveLeftRangeButton = function (leftButton, rightButton, shift) {
     var newX = leftButton.offsetLeft - shift;
     if (newX < 0) {
-      newX = 0 - Math.round(leftButton.clientWidth / 2);
+      newX = 0;
     } else if (newX > rightRangeButton.offsetLeft) {
       newX = rightRangeButton.offsetLeft;
     }

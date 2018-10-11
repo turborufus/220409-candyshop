@@ -59,7 +59,7 @@
     goodElement.querySelector('.card__composition-list').textContent = goodObject.nutritionFacts.contents;
 
     if (goodObject.favorite) {
-      goodElement.classList.toggle('card__btn-favorite--selected');
+      goodElement.querySelector('.card__btn-favorite').classList.add('card__btn-favorite--selected');
     }
 
     return goodElement;
@@ -98,20 +98,21 @@
   };
 
   // добавление/удаление в Избранное
-  var changeFavoriteStatus = function (element) {
-    element.classList.toggle('card__btn-favorite--selected');
-    element.querySelector('.card__btn-favorite').blur();
-    var title = element.querySelector('.card__title').textContent;
+  var toggleCardFavorite = function (cardElement) {
+    cardElement.querySelector('.card__btn-favorite').classList.toggle('card__btn-favorite--selected');
+
+    var title = cardElement.querySelector('.card__title').textContent;
     var goodObjectIndex = window.util.getIndexByTitle(window.data.goods, title);
     window.data.goods[goodObjectIndex].favorite = !window.data.goods[goodObjectIndex].favorite;
+
+    window.filters.updateFavoriteLabel(window.data.goods);
   };
 
   var processCatalogEvent = function (eventString, target) {
     while (target !== catalogElements) {
       if (target.classList.contains('catalog__card')) {
         if (eventString === 'favorite') {
-          changeFavoriteStatus(target);
-          break;
+          toggleCardFavorite(target);
         } else if (eventString === 'add_in_cart') {
           var title = target.querySelector('.card__title').textContent;
           addGoodInCart(title);
@@ -129,7 +130,7 @@
     evt.preventDefault();
     var target = evt.target;
     if (target.classList.contains('card__btn-favorite')) {
-      // обработка события добавления/удаления из Избранного
+      // добавление/удаление из Избранного
       processCatalogEvent('favorite', target);
     } else if (target.classList.contains('card__btn') && !target.disabled) {
       // добавление товара в корзину
