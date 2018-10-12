@@ -4,6 +4,15 @@
   var catalogElements = document.querySelector('.catalog__cards');
   var catalogLoad = catalogElements.querySelector('.catalog__load');
   var cardTemplate = document.querySelector('#card').content.querySelector('.catalog__card');
+  var emptyFilters = document.querySelector('#empty-filters').content.querySelector('.catalog__empty-filter');
+
+  var ratingValueToClassName = {
+    1: 'stars__rating--one',
+    2: 'stars__rating--two',
+    3: 'stars__rating--three',
+    4: 'stars__rating--four',
+    5: 'stars__rating--five'
+  };
 
   var hideCatalogLoad = function () {
     catalogElements.classList.remove('catalog__cards--load');
@@ -37,29 +46,8 @@
     var rating = goodElement.querySelector('.stars__rating');
     rating.classList.remove('stars__rating--five');
     var ratingValue = goodObject.rating.value;
-    var ratingClass = '';
-    switch (ratingValue) {
-      case 1:
-        ratingClass = 'one';
-        break;
-      case 2:
-        ratingClass = 'two';
-        break;
-      case 3:
-        ratingClass = 'three';
-        break;
-      case 4:
-        ratingClass = 'four';
-        break;
-      case 5:
-        ratingClass = 'five';
-        break;
-      default:
-        ratingClass = '';
-        break;
-    }
     rating.textContent = ratingValue + ' ' + window.util.numDecline(ratingValue, 'звезда', 'звёзд', 'звезды');
-    rating.classList.add('stars__rating--' + ratingClass);
+    rating.classList.add(ratingValueToClassName[ratingValue]);
 
     goodElement.querySelector('.star__count').textContent = goodObject.rating.number;
 
@@ -70,19 +58,34 @@
     goodElement.querySelector('.card__characteristic').textContent = sugarText + goodObject.nutritionFacts.energy + ' ккал';
     goodElement.querySelector('.card__composition-list').textContent = goodObject.nutritionFacts.contents;
 
+    if (goodObject.favorite) {
+      goodElement.querySelector('.card__btn-favorite').classList.add('card__btn-favorite--selected');
+    }
+
     return goodElement;
   };
 
-  var renderCatalog = function () {
+  var clearCatalog = function () {
+    catalogElements.innerHTML = '';
+    catalogElements.appendChild(catalogLoad);
+  };
+
+  var renderCatalog = function (goods) {
+    clearCatalog();
     var fragmentOfCards = document.createDocumentFragment();
-    for (var i = 0; i < window.data.goods.length; i++) {
-      var goodElement = createCard(window.data.goods[i]);
+    goods.forEach(function (item) {
+      var goodElement = createCard(item);
       fragmentOfCards.appendChild(goodElement);
-    }
+    });
     catalogElements.appendChild(fragmentOfCards);
   };
 
-    // обработчик добавления в корзину
+  var showEmptyFilters = function () {
+    clearCatalog();
+    catalogElements.appendChild(emptyFilters);
+  };
+
+  // обработчик добавления в корзину
   var addGoodInCart = function (title) {
     var indexOfGood = window.util.getIndexByTitle(window.data.goods, title);
     var indexOfGoodInCart = window.util.getIndexByTitle(window.data.goodsInCart, title);
@@ -94,13 +97,22 @@
     }
   };
 
+  // добавление/удаление в Избранное
+  var toggleCardFavorite = function (cardElement) {
+    cardElement.querySelector('.card__btn-favorite').classList.toggle('card__btn-favorite--selected');
+
+    var title = cardElement.querySelector('.card__title').textContent;
+    var goodObjectIndex = window.util.getIndexByTitle(window.data.goods, title);
+    window.data.goods[goodObjectIndex].favorite = !window.data.goods[goodObjectIndex].favorite;
+
+    window.filters.updateFavoriteLabel(window.data.goods);
+  };
+
   var processCatalogEvent = function (eventString, target) {
     while (target !== catalogElements) {
       if (target.classList.contains('catalog__card')) {
         if (eventString === 'favorite') {
-          target.classList.toggle('card__btn-favorite--selected');
-          target.querySelector('.card__btn-favorite').blur();
-          break;
+          toggleCardFavorite(target);
         } else if (eventString === 'add_in_cart') {
           var title = target.querySelector('.card__title').textContent;
           addGoodInCart(title);
@@ -118,7 +130,7 @@
     evt.preventDefault();
     var target = evt.target;
     if (target.classList.contains('card__btn-favorite')) {
-      // обработка события добавления/удаления из Избранного
+      // добавление/удаление из Избранного
       processCatalogEvent('favorite', target);
     } else if (target.classList.contains('card__btn') && !target.disabled) {
       // добавление товара в корзину
@@ -129,17 +141,12 @@
     }
   };
 
-  var onLoadSuccessHandle = function (goods) {
-    window.data.goods = goods;
-    renderCatalog();
-    hideCatalogLoad();
-  };
-
-  var onLoadErrorHandle = function (errorMessage) {
-    window.modal.showError(errorMessage);
-  };
-
   catalogElements.addEventListener('click', onCatalogCardsClick);
-  window.backend.load(onLoadSuccessHandle, onLoadErrorHandle);
+
+  window.catalog = {
+    render: renderCatalog,
+    hideLoadMessage: hideCatalogLoad,
+    showEmptyFilters: showEmptyFilters
+  };
 
 })();

@@ -5,26 +5,6 @@
     formElement.value = formElement.value.replace(/\D+/g, '');
   };
 
-  var getRandomInt = function (min, max) {
-    return Math.floor(Math.random() * (max - min + 1)) + min;
-  };
-
-  var createRandomIndexes = function (arrayLength) {
-    var randomIndexes = [];
-    for (var i = 0; i < arrayLength; i++) { // заполняем массив
-      randomIndexes.push(i);
-    }
-
-    for (i = arrayLength - 1; i > 0; i--) { // перемешиваем элементы
-      var j = getRandomInt(0, i);
-      var temp = randomIndexes[j];
-      randomIndexes[j] = randomIndexes[i];
-      randomIndexes[i] = temp;
-    }
-
-    return randomIndexes;
-  };
-
   var numDecline = function (num, nominative, genitiveSingular, genitivePlural) {
     if (num > 10 && (Math.round((num % 100) / 10)) === 1) {
       return genitivePlural;
@@ -56,12 +36,27 @@
     return (formElement.classList.contains('visually-hidden'));
   };
 
+  var debounce = function (fun) {
+    var DEBOUNCE_INTERVAL = 500;
+    var lastTimeout = null;
+
+    return function () {
+      var args = arguments;
+      if (lastTimeout) {
+        window.clearTimeout(lastTimeout);
+      }
+      lastTimeout = window.setTimeout(function () {
+        fun.apply(null, args);
+      }, DEBOUNCE_INTERVAL);
+    };
+  };
+
+
   window.util = {
     getIndexByTitle: getIndexByTitle,
     numDecline: numDecline,
-    createRandomIndexes: createRandomIndexes,
-    getRandomInt: getRandomInt,
     onlyNumber: onlyNumber,
-    isFormHidden: isFormHidden
+    isFormHidden: isFormHidden,
+    debounce: debounce
   };
 })();
