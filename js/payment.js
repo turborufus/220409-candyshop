@@ -1,6 +1,8 @@
 'use strict';
 
 (function () {
+  var CARD_NUMBER_LENGTH = 16;
+  
   var payment = document.querySelector('.payment');
   var paymentCard = payment.querySelector('.payment__card-wrap');
   var paymentCash = payment.querySelector('.payment__cash-wrap');
@@ -14,7 +16,7 @@
     var cardNumberDigits = cardNumberValue.replace(/\D+/g, '');
     var sum = 0;
     var arrLength = cardNumberDigits.length;
-    if (arrLength === 16) {
+    if (arrLength === CARD_NUMBER_LENGTH) {
       for (var i = 0; i < arrLength; i++) {
         var digit = parseInt(cardNumberDigits[arrLength - i - 1], 10);
         if (i % 2 === 1) {

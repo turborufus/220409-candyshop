@@ -1,6 +1,7 @@
 'use strict';
 
 (function () {
+  var LITTLE_AMOUNT = 5;
   var catalogCards = document.querySelector('.catalog__cards');
   var catalogLoad = catalogCards.querySelector('.catalog__load');
   var cardTemplate = document.querySelector('#card').content.querySelector('.catalog__card');
@@ -28,7 +29,7 @@
     if (amount === 0) {
       availabilityClass = 'card--soon';
       newCatalogCard.querySelector('.card__btn').disabled = true;
-    } else if ((amount >= 1) && (amount <= 5)) {
+    } else if ((amount >= 1) && (amount <= LITTLE_AMOUNT)) {
       availabilityClass = 'card--little';
     }
     newCatalogCard.classList.add(availabilityClass);
