@@ -1,6 +1,8 @@
 'use strict';
 
 (function () {
+  var DEBOUNCE_INTERVAL = 500;
+
   var onlyNumber = function (formElement) {
     formElement.value = formElement.value.replace(/\D+/g, '');
   };
@@ -24,20 +26,20 @@
   };
 
   var getIndexByTitle = function (goodsArray, title) {
-    for (var i = 0; i < goodsArray.length; i++) {
+    var i = 0;
+    var isFound = false;
+    var index = -1;
+    while (i < goodsArray.length && !isFound) {
       if (goodsArray[i].name === title) {
-        return i;
+        isFound = true;
+        index = i;
       }
+      i += 1;
     }
-    return -1;
-  };
-
-  var isFormHidden = function (formElement) {
-    return (formElement.classList.contains('visually-hidden'));
+    return index;
   };
 
   var debounce = function (fun) {
-    var DEBOUNCE_INTERVAL = 500;
     var lastTimeout = null;
 
     return function () {
@@ -51,12 +53,10 @@
     };
   };
 
-
   window.util = {
     getIndexByTitle: getIndexByTitle,
     numDecline: numDecline,
     onlyNumber: onlyNumber,
-    isFormHidden: isFormHidden,
     debounce: debounce
   };
 })();

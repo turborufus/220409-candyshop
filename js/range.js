@@ -10,11 +10,10 @@
 
   var initRange = function () {
     rightRangeButton.style.left = rightRangeButton.offsetParent.offsetWidth + 'px';
-
     leftRangeButton.style.left = 0 + 'px';
 
-    countOffsetInPercent(rightRangeButton);
-    countOffsetInPercent(leftRangeButton);
+    countPriceRange(rightRangeButton);
+    countPriceRange(leftRangeButton);
 
     rightRangeButton.addEventListener('mousedown', onRangeButtonMouseDown);
     leftRangeButton.addEventListener('mousedown', onRangeButtonMouseDown);
@@ -25,7 +24,7 @@
     rangeFillLine.style.right = (rightRangeButton.offsetParent.offsetWidth - rightRangeButton.offsetLeft) + 'px';
   };
 
-  var countOffsetInPercent = function (element) {
+  var countPriceRange = function (element) {
     var maxWidth = element.offsetParent.offsetWidth;
     var offset = element.offsetLeft;
     var offsetInPercent = Math.round((offset / maxWidth) * 100);
@@ -78,14 +77,14 @@
         moveRightRangeButton(moveTarget, leftRangeButton, shiftX);
       }
 
-      countOffsetInPercent(moveTarget);
+      countPriceRange(moveTarget);
     };
 
     var onRangeButtonMouseUp = function (upEvt) {
       upEvt.preventDefault();
 
       var upTarget = upEvt.target;
-      countOffsetInPercent(upTarget);
+      countPriceRange(upTarget);
 
       upTarget.removeEventListener('mousemove', onRangeButtonMouseMove);
       upTarget.removeEventListener('mouseup', onRangeButtonMouseUp);

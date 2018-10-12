@@ -8,7 +8,10 @@
   var deliverCourierForm = deliver.querySelector('.deliver__courier');
   var submitButton = orderForm.querySelector('.buy__submit-btn');
 
-  // disabled = true / false
+  var isFormHidden = function (form) {
+    return (form.classList.contains('visually-hidden'));
+  };
+
   var setCourierFormDisabled = function (disabled) {
     deliverCourierForm.querySelector('#deliver__street').disabled = disabled;
     deliverCourierForm.querySelector('#deliver__house').disabled = disabled;
@@ -22,6 +25,22 @@
     storeInputs.forEach(function (inputItem) {
       inputItem.disabled = disabled;
     });
+  };
+
+  var setContactDataFormDisabled = function (disabled) {
+    order.querySelector('#contact-data__name').disabled = disabled;
+    order.querySelector('#contact-data__tel').disabled = disabled;
+    order.querySelector('#contact-data__email').disabled = disabled;
+  };
+
+  var setBuyingFormDisabled = function (disabled) {
+    setContactDataFormDisabled(disabled);
+    // форма активна когда disabled и hidden === false
+    // форма неактивна когда хотя бы один из флагов === true
+    window.payment.setCardFormDisabled(disabled || isFormHidden(window.payment.cardForm));
+    setCourierFormDisabled(disabled || isFormHidden(deliverCourierForm));
+    setStoreFormDisabled(disabled || isFormHidden(deliverStoreForm));
+    submitButton.disabled = disabled;
   };
 
   var onDeliverSectionClick = function (evt) {
@@ -43,34 +62,18 @@
     }
   };
 
-  var setContactDataFormDisabled = function (disabled) {
-    order.querySelector('#contact-data__name').disabled = disabled;
-    order.querySelector('#contact-data__tel').disabled = disabled;
-    order.querySelector('#contact-data__email').disabled = disabled;
-  };
-
-  var setBuyingFormDisabled = function (disabled) {
-    setContactDataFormDisabled(disabled);
-    // форма активна когда disabled и hidden === false
-    // форма неактивна когда хотя бы один из флагов === true
-    window.payment.setCardFormDisabled(disabled || window.util.isFormHidden(window.payment.cardForm));
-    setCourierFormDisabled(disabled || window.util.isFormHidden(deliverCourierForm));
-    setStoreFormDisabled(disabled || window.util.isFormHidden(deliverStoreForm));
-    submitButton.disabled = disabled;
-  };
-
-  var onUploadSuccessHandler = function () {
+  var onUploadSuccess = function () {
     window.modal.showSuccess();
   };
 
-  var onUploadErrorHandler = function (errorMessage) {
+  var onUploadError = function (errorMessage) {
     window.modal.showError(errorMessage);
   };
 
   deliver.addEventListener('click', onDeliverSectionClick);
 
   orderForm.addEventListener('submit', function (evt) {
-    window.backend.upload(new FormData(orderForm), onUploadSuccessHandler, onUploadErrorHandler);
+    window.backend.upload(new FormData(orderForm), onUploadSuccess, onUploadError);
     evt.preventDefault();
   });
 

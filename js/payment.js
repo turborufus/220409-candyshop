@@ -5,9 +5,13 @@
   var paymentCard = payment.querySelector('.payment__card-wrap');
   var paymentCash = payment.querySelector('.payment__cash-wrap');
   var cardStatus = paymentCard.querySelector('.payment__card-status');
+  var cardNumber = paymentCard.querySelector('#payment__card-number');
+  var cardDate = paymentCard.querySelector('#payment__card-date');
+  var cardCVC = paymentCard.querySelector('#payment__card-cvc');
+  var cardHolder = paymentCard.querySelector('#payment__cardholder');
 
-  var isCardNumberValid = function (cardNumber) {
-    var cardNumberDigits = cardNumber.replace(/\D+/g, '');
+  var isCardNumberValid = function (cardNumberValue) {
+    var cardNumberDigits = cardNumberValue.replace(/\D+/g, '');
     var sum = 0;
     var arrLength = cardNumberDigits.length;
     if (arrLength === 16) {
@@ -23,13 +27,12 @@
       }
       return (sum % 10 === 0);
     }
-
     return false;
   };
 
-  var onValueChange = function () {
-    var isNumberValid = isCardNumberValid(cardNumberInput.value);
-    var isCardValid = cardNumberInput.validity.valid && cardDateInput.validity.valid && cardCvcInput.validity.valid && cardholderInput.validity.valid && isNumberValid;
+  var changeCardStatus = function () {
+    var isNumberValid = isCardNumberValid(cardNumber.value);
+    var isCardValid = cardNumber.validity.valid && cardDate.validity.valid && cardCVC.validity.valid && cardHolder.validity.valid && isNumberValid;
 
     var statusText = 'Неизвестен';
     if (isCardValid) {
@@ -38,58 +41,53 @@
     cardStatus.textContent = statusText;
   };
 
-  var cardNumberInput = paymentCard.querySelector('#payment__card-number');
-  var cardDateInput = paymentCard.querySelector('#payment__card-date');
-  var cardCvcInput = paymentCard.querySelector('#payment__card-cvc');
-  var cardholderInput = paymentCard.querySelector('#payment__cardholder');
-
-  cardNumberInput.addEventListener('change', function () {
-    if (cardNumberInput.validity.tooShort || cardNumberInput.validity.tooLong) {
-      cardNumberInput.setCustomValidity('Номер карты должен состоять из 16 цифр');
-    } else if (cardNumberInput.validity.valueMissing) {
-      cardNumberInput.setCustomValidity('Поле обязательно к заполнению');
-    } else if (cardNumberInput.validity.patternMismatch) {
-      cardNumberInput.setCustomValidity('Номер карты состоит из 16 цифр');
-    } else if (!isCardNumberValid(cardNumberInput.value)) {
-      cardNumberInput.setCustomValidity('Проверьте правильность указанного номера');
+  var onCardNumberChange = function () {
+    if (cardNumber.validity.tooShort || cardNumber.validity.tooLong) {
+      cardNumber.setCustomValidity('Номер карты должен состоять из 16 цифр');
+    } else if (cardNumber.validity.valueMissing) {
+      cardNumber.setCustomValidity('Поле обязательно к заполнению');
+    } else if (cardNumber.validity.patternMismatch) {
+      cardNumber.setCustomValidity('Номер карты состоит из 16 цифр');
+    } else if (!isCardNumberValid(cardNumber.value)) {
+      cardNumber.setCustomValidity('Проверьте правильность указанного номера');
     } else {
-      cardNumberInput.setCustomValidity('');
+      cardNumber.setCustomValidity('');
     }
-    onValueChange();
-  });
+    changeCardStatus();
+  };
 
-  cardDateInput.addEventListener('change', function () {
-    if (cardDateInput.validity.tooShort || cardDateInput.validity.tooLong || cardDateInput.validity.patternMismatch) {
-      cardDateInput.setCustomValidity('Срок действия карты должен быть указан в формате ММ/ГГ');
-    } else if (cardDateInput.validity.valueMissing) {
-      cardDateInput.setCustomValidity('Поле обязательно к заполнению');
+  var onCardDateChange = function () {
+    if (cardDate.validity.tooShort || cardDate.validity.tooLong || cardDate.validity.patternMismatch) {
+      cardDate.setCustomValidity('Срок действия карты должен быть указан в формате ММ/ГГ');
+    } else if (cardDate.validity.valueMissing) {
+      cardDate.setCustomValidity('Поле обязательно к заполнению');
     } else {
-      cardDateInput.setCustomValidity('');
+      cardDate.setCustomValidity('');
     }
-    onValueChange();
-  });
+    changeCardStatus();
+  };
 
-  cardCvcInput.addEventListener('change', function () {
-    if (cardCvcInput.validity.tooShort || cardCvcInput.validity.tooLong || cardCvcInput.validity.patternMismatch) {
-      cardCvcInput.setCustomValidity('Поле должно содержать 3 цифры');
-    } else if (cardCvcInput.validity.valueMissing) {
-      cardCvcInput.setCustomValidity('Поле обязательно к заполнению');
+  var onCardCVCChange = function () {
+    if (cardCVC.validity.tooShort || cardCVC.validity.tooLong || cardCVC.validity.patternMismatch) {
+      cardCVC.setCustomValidity('Поле должно содержать 3 цифры');
+    } else if (cardCVC.validity.valueMissing) {
+      cardCVC.setCustomValidity('Поле обязательно к заполнению');
     } else {
-      cardCvcInput.setCustomValidity('');
+      cardCVC.setCustomValidity('');
     }
-    onValueChange();
-  });
+    changeCardStatus();
+  };
 
-  cardholderInput.addEventListener('change', function () {
-    if (cardholderInput.validity.patternMismatch) {
-      cardholderInput.setCustomValidity('Поле должно содержать только латинские буквы');
-    } else if (cardholderInput.validity.valueMissing) {
-      cardholderInput.setCustomValidity('Поле обязательно к заполнению');
+  var onCardHolderChange = function () {
+    if (cardHolder.validity.patternMismatch) {
+      cardHolder.setCustomValidity('Поле должно содержать только латинские буквы');
+    } else if (cardHolder.validity.valueMissing) {
+      cardHolder.setCustomValidity('Поле обязательно к заполнению');
     } else {
-      cardholderInput.setCustomValidity('');
+      cardHolder.setCustomValidity('');
     }
-    onValueChange();
-  });
+    changeCardStatus();
+  };
 
   var setPaymentCardFormDisabled = function (disabled) {
     paymentCard.querySelector('#payment__card-number').disabled = disabled;
@@ -100,7 +98,6 @@
 
   var onPaymentSectionClick = function (evt) {
     var target = evt.target;
-
     var hiddenClass = 'visually-hidden';
 
     if (target.id === 'payment__card') {
@@ -116,6 +113,10 @@
     }
   };
 
+  cardNumber.addEventListener('change', onCardNumberChange);
+  cardDate.addEventListener('change', onCardDateChange);
+  cardCVC.addEventListener('change', onCardCVCChange);
+  cardHolder.addEventListener('change', onCardHolderChange);
   payment.addEventListener('click', onPaymentSectionClick);
 
   window.payment = {
