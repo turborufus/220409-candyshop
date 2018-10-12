@@ -1,76 +1,80 @@
 'use strict';
 
 (function () {
-  var cartElements = document.querySelector('.goods__cards');
+  var cartCards = document.querySelector('.goods__cards');
   var cardEmpty = document.querySelector('.goods__card-empty');
-
-  var cardInCartTemplate = document.querySelector('#card-order').content.querySelector('.goods_card');
+  var mainCartHeader = document.querySelector('.main-header__basket');
+  var cartCardTemplate = document.querySelector('#card-order').content.querySelector('.goods_card');
 
   var getCartNumerics = function () {
     var numDataObject = {
       orderedAmount: 0,
       price: 0
     };
-    window.data.goodsInCart.forEach(function (item) {
-      numDataObject.orderedAmount += item.orderedAmount;
-      numDataObject.price += item.orderedAmount * item.price;
+    window.data.goodsInCart.forEach(function (good) {
+      numDataObject.orderedAmount += good.orderedAmount;
+      numDataObject.price += good.orderedAmount * good.price;
     });
     return numDataObject;
   };
 
-  var changeMainBasketHeader = function () {
-    var mainBasketHeader = document.querySelector('.main-header__basket');
-
+  var changeMainCartHeader = function () {
     var numDataObject = getCartNumerics();
 
     if (numDataObject.orderedAmount > 0) {
-      mainBasketHeader.textContent = 'В корзине ' + numDataObject.orderedAmount + window.util.numDecline(numDataObject.orderedAmount, ' товар', ' товара', ' товаров') + ' на сумму ' + numDataObject.price + ' ₽';
+      mainCartHeader.textContent = 'В корзине ' + numDataObject.orderedAmount
+        + window.util.numDecline(numDataObject.orderedAmount, ' товар', ' товара', ' товаров')
+        + ' на сумму ' + numDataObject.price + ' ₽';
     } else {
-      mainBasketHeader.textContent = 'В корзине ничего нет';
+      mainCartHeader.textContent = 'В корзине ничего нет';
     }
   };
 
-  // создание карточки в корзине
   var createCardInCart = function (goodObject) {
-    var cartElement = cardInCartTemplate.cloneNode(true);
-    cartElement.querySelector('.card-order__title').textContent = goodObject.name;
-
-    cartElement.querySelector('.card-order__img').src = 'img/cards/' + goodObject.picture;
-    cartElement.querySelector('.card-order__img').alt = goodObject.name;
-
-    cartElement.querySelector('.card-order__price').textContent = goodObject.price + ' ₽';
-
-    cartElement.querySelector('.card-order__count').value = goodObject.orderedAmount;
-
-    return cartElement;
+    var cartCard = cartCardTemplate.cloneNode(true);
+    cartCard.querySelector('.card-order__title').textContent = goodObject.name;
+    cartCard.querySelector('.card-order__img').src = 'img/cards/' + goodObject.picture;
+    cartCard.querySelector('.card-order__img').alt = goodObject.name;
+    cartCard.querySelector('.card-order__price').textContent = goodObject.price + ' ₽';
+    cartCard.querySelector('.card-order__count').value = goodObject.orderedAmount;
+    return cartCard;
   };
 
+  var cartIsEmpty = function () {
+    return (window.data.goodsInCart.length === 0);
+  };
 
-  var renderCart = function () {
-    cartElements.innerHTML = '';
-    cartElements.appendChild(cardEmpty);
-
-    if (window.data.goodsInCart.length === 0) {
+  var showEmptyCard = function (show) {
+    if (show) {
       cardEmpty.classList.remove('visually-hidden');
-      cartElements.classList.add('goods__cards--empty');
-
-      window.order.setBuyingFormDisabled(true);
+      cartCards.classList.add('goods__cards--empty');
     } else {
       cardEmpty.classList.add('visually-hidden');
-      cartElements.classList.remove('goods__cards--empty');
+      cartCards.classList.remove('goods__cards--empty');
+    }
+  };
 
-      var fragmentOfElements = document.createDocumentFragment();
+  var renderCart = function () {
+    cartCards.innerHTML = '';
+    cartCards.appendChild(cardEmpty);
+
+    if (cartIsEmpty()) {
+      showEmptyCard(true);
+      window.order.setBuyingFormDisabled(true);
+    } else {
+      showEmptyCard(false);
+      var fragment = document.createDocumentFragment();
 
       window.data.goodsInCart.forEach(function (item) {
-        var newCartElement = createCardInCart(item);
-        fragmentOfElements.appendChild(newCartElement);
+        var newCartCard = createCardInCart(item);
+        fragment.appendChild(newCartCard);
       });
-      cartElements.appendChild(fragmentOfElements);
 
+      cartCards.appendChild(fragment);
       window.order.setBuyingFormDisabled(false);
     }
 
-    changeMainBasketHeader();
+    changeMainCartHeader();
   };
 
   var removeGoodFromCart = function (goodObject) {
@@ -108,7 +112,7 @@
   };
 
   var processCartEvent = function (eventName, target) {
-    while (target !== cartElements) {
+    while (target !== cartCards) {
       if (target.classList.contains('goods_card')) {
         var title = target.querySelector('.card-order__title').textContent;
         var goodInCartObject = window.data.goodsInCart[window.util.getIndexByTitle(window.data.goodsInCart, title)];
@@ -140,15 +144,7 @@
     }
   };
 
-  var cartIsEmpty = function () {
-    return (cartElements.classList.contains('goods__cards--empty'));
-  };
-
-  cartElements.addEventListener('click', onCartCardsClick);
-
-  if (cartIsEmpty()) {
-    window.order.setBuyingFormDisabled(true);
-  }
+  cartCards.addEventListener('click', onCartCardsClick);
 
   window.cart = {
     increaseAmountOfGood: increaseAmountOfGood,
