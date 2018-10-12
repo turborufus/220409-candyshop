@@ -2,7 +2,7 @@
 
 (function () {
   var CARD_NUMBER_LENGTH = 16;
-  
+
   var payment = document.querySelector('.payment');
   var paymentCard = payment.querySelector('.payment__card-wrap');
   var paymentCash = payment.querySelector('.payment__cash-wrap');
