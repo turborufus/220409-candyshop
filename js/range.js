@@ -31,7 +31,8 @@
 
     if (element === leftRangeButton) {
       priceMin.textContent = offsetInPercent;
-    } else if (element === rightRangeButton) {
+    }
+    if (element === rightRangeButton) {
       priceMax.textContent = offsetInPercent;
     }
 
@@ -42,7 +43,8 @@
     var newX = rightButton.offsetLeft - shift;
     if (newX < leftRangeButton.offsetLeft) {
       newX = leftRangeButton.offsetLeft;
-    } else if (newX > rightButton.offsetParent.offsetWidth) {
+    }
+    if (newX > rightButton.offsetParent.offsetWidth) {
       newX = rightButton.offsetParent.offsetWidth;
     }
     rightButton.style.left = newX + 'px';
@@ -52,7 +54,8 @@
     var newX = leftButton.offsetLeft - shift;
     if (newX < 0) {
       newX = 0;
-    } else if (newX > rightRangeButton.offsetLeft) {
+    }
+    if (newX > rightRangeButton.offsetLeft) {
       newX = rightRangeButton.offsetLeft;
     }
     leftButton.style.left = newX + 'px';
@@ -73,7 +76,8 @@
 
       if (moveTarget === leftRangeButton) {
         moveLeftRangeButton(moveTarget, rightRangeButton, shiftX);
-      } else if (moveTarget === rightRangeButton) {
+      }
+      if (moveTarget === rightRangeButton) {
         moveRightRangeButton(moveTarget, leftRangeButton, shiftX);
       }
 

@@ -2,6 +2,7 @@
 
 (function () {
   var LITTLE_AMOUNT = 5;
+
   var catalogCards = document.querySelector('.catalog__cards');
   var catalogLoad = catalogCards.querySelector('.catalog__load');
   var cardTemplate = document.querySelector('#card').content.querySelector('.catalog__card');
@@ -17,7 +18,7 @@
 
   var hideCatalogLoad = function () {
     catalogCards.classList.remove('catalog__cards--load');
-    catalogLoad.classList.add('visually-hidden');
+    catalogLoad.classList.add(window.util.HIDDEN_CLASSNAME);
   };
 
   var createCard = function (goodObject) {
@@ -88,8 +89,7 @@
     var indexOfGoodInCart = window.util.getIndexByTitle(window.data.goodsInCart, title);
     if (indexOfGoodInCart === -1) {
       window.cart.addGood(window.data.goods[indexOfGood]);
-    } else {
-      window.cart.increaseAmountOfGood(indexOfGoodInCart);
+    } else {      window.cart.increaseAmountOfGood(window.data.goodsInCart[indexOfGoodInCart]);
     }
   };
 
@@ -108,11 +108,13 @@
       if (target.classList.contains('catalog__card')) {
         if (eventString === 'favorite') {
           toggleCardFavorite(target);
-        } else if (eventString === 'add_in_cart') {
+        }
+        if (eventString === 'add_in_cart') {
           var title = target.querySelector('.card__title').textContent;
           addGoodInCart(title);
           break;
-        } else if (eventString === 'show_composition') {
+        }
+        if (eventString === 'show_composition') {
           var composition = target.querySelector('.card__composition');
           composition.classList.toggle('card__composition--hidden');
         }
@@ -127,10 +129,12 @@
     if (target.classList.contains('card__btn-favorite')) {
       // добавление/удаление из Избранного
       processCatalogEvent('favorite', target);
-    } else if (target.classList.contains('card__btn') && !target.disabled) {
+    }
+    if (target.classList.contains('card__btn') && !target.disabled) {
       // добавление товара в корзину
       processCatalogEvent('add_in_cart', target);
-    } else if (target.classList.contains('card__btn-composition')) {
+    }
+    if (target.classList.contains('card__btn-composition')) {
       // закрывает / раскрывает состав карточки
       processCatalogEvent('show_composition', target);
     }

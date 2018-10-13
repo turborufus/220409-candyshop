@@ -11,10 +11,7 @@
     window.filters.initItemCountLabels(window.data.goods);
 
     window.catalog.hideLoadMessage();
-
-    if (window.cart.isEmpty()) {
-      window.order.setBuyingFormDisabled(true);
-    }
+    window.order.activate(false);
   };
 
   var onLoadErrorHandle = function (errorMessage) {

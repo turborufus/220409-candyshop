@@ -2,6 +2,7 @@
 
 (function () {
   var DEBOUNCE_INTERVAL = 500;
+  var HIDDEN_CLASSNAME = 'visually-hidden';
 
   var onlyNumber = function (formElement) {
     formElement.value = formElement.value.replace(/\D+/g, '');
@@ -57,6 +58,7 @@
     getIndexByTitle: getIndexByTitle,
     numDecline: numDecline,
     onlyNumber: onlyNumber,
-    debounce: debounce
+    debounce: debounce,
+    HIDDEN_CLASSNAME: HIDDEN_CLASSNAME
   };
 })();

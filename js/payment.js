@@ -100,18 +100,18 @@
 
   var onPaymentSectionClick = function (evt) {
     var target = evt.target;
-    var hiddenClass = 'visually-hidden';
 
     if (target.id === 'payment__card') {
-      paymentCard.classList.remove(hiddenClass);
+      paymentCard.classList.remove(window.util.HIDDEN_CLASSNAME);
       setPaymentCardFormDisabled(window.cart.isEmpty()); // если корзина пустая, то форма оставется неактивной
 
-      paymentCash.classList.add(hiddenClass);
-    } else if (target.id === 'payment__cash') {
-      paymentCard.classList.add(hiddenClass);
+      paymentCash.classList.add(window.util.HIDDEN_CLASSNAME);
+    }
+    if (target.id === 'payment__cash') {
+      paymentCard.classList.add(window.util.HIDDEN_CLASSNAME);
       setPaymentCardFormDisabled(true);
 
-      paymentCash.classList.remove(hiddenClass);
+      paymentCash.classList.remove(window.util.HIDDEN_CLASSNAME);
     }
   };
 

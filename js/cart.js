@@ -4,6 +4,9 @@
   var cartCards = document.querySelector('.goods__cards');
   var cardEmpty = document.querySelector('.goods__card-empty');
   var mainCartHeader = document.querySelector('.main-header__basket');
+  var goodsTotal = document.querySelector('.goods__total');
+  var goodsTotalCount = goodsTotal.querySelector('.goods__total-count');
+  var goodsOrder = goodsTotal.querySelector('.goods__order-link');
   var cartCardTemplate = document.querySelector('#card-order').content.querySelector('.goods_card');
 
   var getCartNumerics = function () {
@@ -18,15 +21,20 @@
     return numDataObject;
   };
 
-  var changeMainCartHeader = function () {
-    var numDataObject = getCartNumerics();
-
+  var changeMainCartHeader = function (numDataObject) {
     if (numDataObject.orderedAmount > 0) {
       mainCartHeader.textContent = 'В корзине ' + numDataObject.orderedAmount
         + window.util.numDecline(numDataObject.orderedAmount, ' товар', ' товара', ' товаров')
         + ' на сумму ' + numDataObject.price + ' ₽';
     } else {
       mainCartHeader.textContent = 'В корзине ничего нет';
+    }
+  };
+
+  var changeGoodsTotalCount = function (numDataObject) {
+    if (numDataObject.orderedAmount > 0) {
+      goodsTotalCount.firstChild.textContent = 'Итого за ' + numDataObject.orderedAmount + window.util.numDecline(numDataObject.orderedAmount, ' товар:', ' товара:', ' товаров:');
+      goodsTotal.querySelector('.goods__price').textContent = numDataObject.price + ' ₽';
     }
   };
 
@@ -46,11 +54,22 @@
 
   var showEmptyCard = function (show) {
     if (show) {
-      cardEmpty.classList.remove('visually-hidden');
+      cardEmpty.classList.remove(window.util.HIDDEN_CLASSNAME);
       cartCards.classList.add('goods__cards--empty');
     } else {
-      cardEmpty.classList.add('visually-hidden');
+      cardEmpty.classList.add(window.util.HIDDEN_CLASSNAME);
       cartCards.classList.remove('goods__cards--empty');
+    }
+  };
+
+  var showGoodsTotal = function (show) {
+    var disabledClass = 'goods__order-link--disabled';
+    if (show) {
+      goodsTotal.classList.remove(window.util.HIDDEN_CLASSNAME);
+      goodsOrder.classList.remove(disabledClass);
+    } else {
+      goodsTotal.classList.add(window.util.HIDDEN_CLASSNAME);
+      goodsOrder.classList.add(disabledClass);
     }
   };
 
@@ -60,7 +79,7 @@
 
     if (cartIsEmpty()) {
       showEmptyCard(true);
-      window.order.setBuyingFormDisabled(true);
+      window.order.activate(false);
     } else {
       showEmptyCard(false);
       var fragment = document.createDocumentFragment();
@@ -71,10 +90,13 @@
       });
 
       cartCards.appendChild(fragment);
-      window.order.setBuyingFormDisabled(false);
+      cartCards.appendChild(goodsTotal);
+      showGoodsTotal(true);
     }
 
-    changeMainCartHeader();
+    var cartNumerics = getCartNumerics();
+    changeMainCartHeader(cartNumerics);
+    changeGoodsTotalCount(cartNumerics);
   };
 
   var removeGoodFromCart = function (goodObject) {
@@ -120,10 +142,12 @@
         if (eventName === 'increase') {
           increaseAmountOfGood(goodInCartObject);
           break;
-        } else if (eventName === 'decrease') {
+        }
+        if (eventName === 'decrease') {
           decreaseAmountOfGood(goodInCartObject);
           break;
-        } else if (eventName === 'remove') {
+        }
+        if (eventName === 'remove') {
           removeGoodFromCart(goodInCartObject);
           break;
         }
@@ -137,14 +161,20 @@
     var target = evt.target;
     if (target.classList.contains('card-order__btn--increase')) {
       processCartEvent('increase', target);
-    } else if (target.classList.contains('card-order__btn--decrease')) {
+    }
+    if (target.classList.contains('card-order__btn--decrease')) {
       processCartEvent('decrease', target);
-    } else if (target.classList.contains('card-order__close')) {
+    }
+    if (target.classList.contains('card-order__close')) {
       processCartEvent('remove', target);
     }
   };
 
   cartCards.addEventListener('click', onCartCardsClick);
+
+  goodsOrder.addEventListener('click', function () {
+    window.order.activate(true);
+  });
 
   window.cart = {
     increaseAmountOfGood: increaseAmountOfGood,
