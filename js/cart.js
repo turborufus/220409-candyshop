@@ -99,36 +99,52 @@
     changeGoodsTotalCount(cartNumerics);
   };
 
-  var removeGoodFromCart = function (goodObject) {
-    var indexOfGood = window.util.getIndexByTitle(window.data.goodsInCart, goodObject.name);
-    window.data.goodsInCart.splice(indexOfGood, 1);
+  var removeGoodFromCart = function (cartGood) {
+    var indexGoodInCart = window.util.getIndexByTitle(window.data.goodsInCart, cartGood.name);
+    var indexGood = window.util.getIndexByTitle(window.data.goods, cartGood.name);
+    var catalogGood = window.data.goods[indexGood];
+
+    catalogGood.amount += cartGood.orderedAmount;
+    window.filters.update(window.data.goods);
+    window.data.goodsInCart.splice(indexGoodInCart, 1);
     renderCart();
   };
 
-  var increaseAmountOfGood = function (goodObject) {
-    if (goodObject.orderedAmount < goodObject.amount) {
-      goodObject.orderedAmount += 1;
+  var increaseAmountOfGood = function (cartGood) {
+    var indexGood = window.util.getIndexByTitle(window.data.goods, cartGood.name);
+    var catalogGood = window.data.goods[indexGood];
+
+    if (catalogGood.amount > 0) {
+      cartGood.orderedAmount += 1;
+      catalogGood.amount -= 1;
+      window.filters.update(window.data.goods);
       renderCart();
     }
   };
 
-  var decreaseAmountOfGood = function (goodObject) {
-    goodObject.orderedAmount -= 1;
-    if (goodObject.orderedAmount <= 0) {
-      removeGoodFromCart(goodObject);
+  var decreaseAmountOfGood = function (cartGood) {
+    var indexGood = window.util.getIndexByTitle(window.data.goods, cartGood.name);
+    var catalogGood = window.data.goods[indexGood];
+
+    if (cartGood.orderedAmount === 1) {
+      removeGoodFromCart(cartGood);
     } else {
+      cartGood.orderedAmount -= 1;
+      catalogGood.amount += 1;
+      window.filters.update(window.data.goods);
       renderCart();
     }
   };
 
-  var addGoodInCart = function (goodObject) {
+  var addGoodInCart = function (catalogGood) {
     var addedGoodObject = {
-      name: goodObject.name,
-      picture: goodObject.picture,
-      amount: goodObject.amount,
-      price: goodObject.price,
+      name: catalogGood.name,
+      picture: catalogGood.picture,
+      price: catalogGood.price,
       orderedAmount: 1
     };
+    catalogGood.amount -= addedGoodObject.orderedAmount;
+    window.filters.update(window.data.goods);
     window.data.goodsInCart.push(addedGoodObject);
     renderCart();
   };

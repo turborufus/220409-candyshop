@@ -6,6 +6,7 @@
   var showAllButton = catalogFilterForm.querySelector('.catalog__submit');
   var availabilityFilter = catalogFilterForm.querySelector('#filter-availability');
   var favoriteFilter = catalogFilterForm.querySelector('#filter-favorite');
+  var sortDefault = catalogFilterForm.querySelector('#filter-popular');
 
   var typeFilters = catalogFilterForm.querySelectorAll('input[name=food-type]');
   var propertyFilters = catalogFilterForm.querySelectorAll('input[name=food-property]');
@@ -174,6 +175,11 @@
     markFilters.forEach(function (item) {
       item.checked = false;
     });
+    window.range.clearFilter();
+  };
+
+  var setSortDefault = function () {
+    sortDefault.checked = true;
   };
 
   catalogFilterForm.addEventListener('change', function () {
@@ -183,7 +189,8 @@
   showAllButton.addEventListener('click', function (evt) {
     evt.preventDefault();
     uncheckAllFilters();
-    window.catalog.render(window.data.goods);
+    setSortDefault();
+    update(window.data.goods);
   });
 
   availabilityFilter.addEventListener('click', function () {

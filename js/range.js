@@ -8,7 +8,7 @@
   var priceMax = range.querySelector('.range__price--max');
   var rangeFillLine = range.querySelector('.range__fill-line');
 
-  var initRange = function () {
+  var clearRangeFilter = function () {
     rightRangeButton.style.left = rightRangeButton.offsetParent.offsetWidth + 'px';
     leftRangeButton.style.left = 0 + 'px';
 
@@ -100,7 +100,7 @@
   };
 
   window.range = {
-    init: initRange
+    clearFilter: clearRangeFilter
   };
 
 })();

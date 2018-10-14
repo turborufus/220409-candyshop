@@ -7,7 +7,7 @@
       goodObject.favorite = false; // добавляем новое поле для фильтрации по Извранным
     });
     window.catalog.render(window.data.goods);
-    window.range.init();
+    window.range.clearFilter();
     window.filters.initItemCountLabels(window.data.goods);
 
     window.catalog.hideLoadMessage();
