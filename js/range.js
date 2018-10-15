@@ -2,101 +2,85 @@
 
 (function () {
   var range = document.querySelector('.range');
-  var rightRangeButton = range.querySelector('.range__btn--right');
-  var leftRangeButton = range.querySelector('.range__btn--left');
+  var rangeFilterBar = range.querySelector('.range__filter');
+  var rangeButtonRight = range.querySelector('.range__btn--right');
+  var rangeButtonLeft = range.querySelector('.range__btn--left');
   var priceMin = range.querySelector('.range__price--min');
   var priceMax = range.querySelector('.range__price--max');
   var rangeFillLine = range.querySelector('.range__fill-line');
 
+  var rangeButtonWidth = rangeButtonRight.offsetWidth;
+  var rangeFilterBarWidth = rangeFilterBar.offsetWidth - rangeButtonWidth;
+  var leftEdge = rangeFilterBar.getBoundingClientRect().left;
+  var rightEdge = rangeFilterBar.getBoundingClientRect().right - rangeButtonWidth;
+  var positionBtnLeft = 0;
+  var positionBtnRight = rightEdge - leftEdge;
+
   var clearRangeFilter = function () {
-    rightRangeButton.style.left = rightRangeButton.offsetParent.offsetWidth + 'px';
-    leftRangeButton.style.left = 0 + 'px';
+    positionBtnLeft = 0;
+    positionBtnRight = rightEdge - leftEdge;
 
-    countPriceRange(rightRangeButton);
-    countPriceRange(leftRangeButton);
+    rangeButtonRight.style.left = positionBtnRight + 'px';
+    rangeButtonLeft.style.left = positionBtnLeft + 'px';
 
-    rightRangeButton.addEventListener('mousedown', onRangeButtonMouseDown);
-    leftRangeButton.addEventListener('mousedown', onRangeButtonMouseDown);
+    priceMin.textContent = calcPriceValue(rangeButtonLeft);
+    priceMax.textContent = calcPriceValue(rangeButtonRight);
+
+    renderFillLine();
+
+    rangeButtonRight.addEventListener('mousedown', function (evt) {
+      evt.preventDefault();
+      onRangeButtonMouseDown(evt, rangeButtonRight, positionBtnLeft, rangeFilterBarWidth, priceMax, false);
+    });
+    rangeButtonLeft.addEventListener('mousedown', function (evt) {
+      evt.preventDefault();
+      onRangeButtonMouseDown(evt, rangeButtonLeft, 0, positionBtnRight, priceMin, true);
+    });
   };
 
   var renderFillLine = function () {
-    rangeFillLine.style.left = (leftRangeButton.offsetLeft + leftRangeButton.clientWidth) + 'px';
-    rangeFillLine.style.right = (rightRangeButton.offsetParent.offsetWidth - rightRangeButton.offsetLeft) + 'px';
+    rangeFillLine.style.left = (rangeButtonLeft.offsetLeft + rangeButtonWidth) + 'px';
+    rangeFillLine.style.right = (rangeFilterBarWidth - rangeButtonRight.offsetLeft) + 'px';
   };
 
-  var countPriceRange = function (element) {
-    var maxWidth = element.offsetParent.offsetWidth;
-    var offset = element.offsetLeft;
-    var offsetInPercent = Math.round((offset / maxWidth) * 100);
-
-    if (element === leftRangeButton) {
-      priceMin.textContent = offsetInPercent;
-    }
-    if (element === rightRangeButton) {
-      priceMax.textContent = offsetInPercent;
-    }
-
-    renderFillLine();
+  var calcPriceValue = function (positionBtn) {
+    var maxWidth = rangeFilterBarWidth;
+    var offset = positionBtn.offsetLeft;
+    return Math.round((offset / maxWidth) * 100);
   };
 
-  var moveRightRangeButton = function (rightButton, leftButton, shift) {
-    var newX = rightButton.offsetLeft - shift;
-    if (newX < leftRangeButton.offsetLeft) {
-      newX = leftRangeButton.offsetLeft;
-    }
-    if (newX > rightButton.offsetParent.offsetWidth) {
-      newX = rightButton.offsetParent.offsetWidth;
-    }
-    rightButton.style.left = newX + 'px';
-  };
+  var onRangeButtonMouseDown = function (evt, rangeButton, minLeft, maxRight, priceLabel, isLeftBtn) {
+    var shiftX = evt.clientX - rangeButton.getBoundingClientRect().left;
 
-  var moveLeftRangeButton = function (leftButton, rightButton, shift) {
-    var newX = leftButton.offsetLeft - shift;
-    if (newX < 0) {
-      newX = 0;
-    }
-    if (newX > rightRangeButton.offsetLeft) {
-      newX = rightRangeButton.offsetLeft;
-    }
-    leftButton.style.left = newX + 'px';
-  };
+    var onMouseMove = function (evtMove) {
+      var newX = evtMove.clientX - shiftX - leftEdge;
 
-  var onRangeButtonMouseDown = function (evt) {
-    evt.preventDefault();
-    var target = evt.target;
-
-    var startX = evt.clientX;
-
-    var onRangeButtonMouseMove = function (moveEvt) {
-      moveEvt.preventDefault();
-      var moveTarget = moveEvt.target;
-
-      var shiftX = startX - moveEvt.clientX;
-      startX = moveEvt.clientX;
-
-      if (moveTarget === leftRangeButton) {
-        moveLeftRangeButton(moveTarget, rightRangeButton, shiftX);
-      }
-      if (moveTarget === rightRangeButton) {
-        moveRightRangeButton(moveTarget, leftRangeButton, shiftX);
+      if (newX < minLeft) {
+        newX = minLeft;
+      } else if (newX > maxRight) {
+        newX = maxRight;
       }
 
-      countPriceRange(moveTarget);
+      rangeButton.style.left = newX + 'px';
+      priceLabel.textContent = calcPriceValue(rangeButton);
+
+      if (isLeftBtn) {
+        positionBtnLeft = newX;
+      } else {
+        positionBtnRight = newX;
+      }
+
+      renderFillLine();
     };
 
-    var onRangeButtonMouseUp = function (upEvt) {
-      upEvt.preventDefault();
-
-      var upTarget = upEvt.target;
-      countPriceRange(upTarget);
-
-      upTarget.removeEventListener('mousemove', onRangeButtonMouseMove);
-      upTarget.removeEventListener('mouseup', onRangeButtonMouseUp);
+    var onMouseUp = function () {
+      document.removeEventListener('mousemove', onMouseMove);
+      document.removeEventListener('mouseup', onMouseUp);
       window.util.debounce(window.filters.update(window.data.goods));
     };
 
-    target.addEventListener('mousemove', onRangeButtonMouseMove);
-    target.addEventListener('mouseup', onRangeButtonMouseUp);
+    document.addEventListener('mousemove', onMouseMove);
+    document.addEventListener('mouseup', onMouseUp);
   };
 
   window.range = {
